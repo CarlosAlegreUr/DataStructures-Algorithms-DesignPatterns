@@ -1,31 +1,43 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <algorithm> 
-#include <openssl/sha.h>
+#include <algorithm>
+#include <openssl/evp.h>
 #include <iomanip>
 #include <sstream>
 
-std::string sha256(const std::string& data) {
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    SHA256_CTX sha256;
-    SHA256_Init(&sha256);
-    SHA256_Update(&sha256, data.c_str(), data.size());
-    SHA256_Final(hash, &sha256);
+std::string sha256(const std::string &data)
+{
+    EVP_MD_CTX *mdctx;
+    const EVP_MD *md;
+    unsigned char hash[EVP_MAX_MD_SIZE];
+    unsigned int md_len;
+
+    md = EVP_sha256();
+    mdctx = EVP_MD_CTX_new();
+    EVP_DigestInit_ex(mdctx, md, NULL);
+    EVP_DigestUpdate(mdctx, data.c_str(), data.size());
+    EVP_DigestFinal_ex(mdctx, hash, &md_len);
+    EVP_MD_CTX_free(mdctx);
+
     std::stringstream ss;
-    for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
+    for (unsigned int i = 0; i < md_len; ++i)
+    {
         ss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
     }
     return ss.str();
 }
 
-class MerkleTree {
+class MerkleTree
+{
 public:
-    MerkleTree(const std::vector<std::string>& transactions) {
+    MerkleTree(const std::vector<std::string> &transactions)
+    {
         buildTree(transactions);
     }
 
-    bool contains(const std::string& transaction) {
+    bool contains(const std::string &transaction)
+    {
         std::string hash = sha256(transaction);
         return std::find(hashes.begin(), hashes.end(), hash) != hashes.end();
     }
@@ -33,22 +45,30 @@ public:
 private:
     std::vector<std::string> hashes;
 
-    void buildTree(const std::vector<std::string>& transactions) {
-        if (transactions.empty()) return;
+    void buildTree(const std::vector<std::string> &transactions)
+    {
+        if (transactions.empty())
+            return;
 
         std::vector<std::string> currentLevel;
 
-        for (const auto& tx : transactions) {
+        for (const auto &tx : transactions)
+        {
             currentLevel.push_back(sha256(tx));
         }
 
-        while (currentLevel.size() > 1) {
+        while (currentLevel.size() > 1)
+        {
             std::vector<std::string> nextLevel;
 
-            for (size_t i = 0; i < currentLevel.size(); i += 2) {
-                if (i + 1 < currentLevel.size()) {
+            for (size_t i = 0; i < currentLevel.size(); i += 2)
+            {
+                if (i + 1 < currentLevel.size())
+                {
                     nextLevel.push_back(sha256(currentLevel[i] + currentLevel[i + 1]));
-                } else {
+                }
+                else
+                {
                     nextLevel.push_back(currentLevel[i]);
                 }
             }
@@ -61,12 +81,34 @@ private:
     }
 };
 
-int main() {
-    std::vector<std::string> transactions = {
-        "Tx1", "Tx2", "Tx3", "Tx4", "Tx5"
-    };
+#include <cassert>
 
-    for (int i = 0; i < transactions.size(); ++i) {
+void run_tests()
+{
+    std::vector<std::string> transactions = {"Tx1", "Tx2", "Tx3", "Tx4", "Tx5"};
+
+    MerkleTree merkleTree(transactions);
+
+    for (const auto &tx : transactions)
+    {
+        assert(merkleTree.contains(tx));
+    }
+
+    std::string nonExistentTransaction = "NonExistent";
+    assert(!merkleTree.contains(nonExistentTransaction));
+
+    std::cout << "All tests passed." << std::endl;
+}
+
+int main()
+{
+    run_tests();
+
+    std::vector<std::string> transactions = {
+        "Tx1", "Tx2", "Tx3", "Tx4", "Tx5"};
+
+    for (size_t i = 0; i < transactions.size(); ++i)
+    { // Changed the loop index variable type to size_t
         transactions[i] += std::to_string(rand());
     }
 
@@ -74,10 +116,14 @@ int main() {
 
     std::string input;
     std::cout << "Enter a transaction to check if it's in the Merkle Tree (type 'exit' to quit): ";
-    while (std::getline(std::cin, input) && input != "exit") {
-        if (merkleTree.contains(input)) {
+    while (std::getline(std::cin, input) && input != "exit")
+    {
+        if (merkleTree.contains(input))
+        {
             std::cout << "The transaction is in the Merkle Tree." << std::endl;
-        } else {
+        }
+        else
+        {
             std::cout << "The transaction is not in the Merkle Tree." << std::endl;
         }
         std::cout << "Enter another transaction (type 'exit' to quit): ";
