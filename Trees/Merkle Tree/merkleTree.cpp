@@ -1,4 +1,5 @@
 #include "merkleTree.h"
+#include <iostream>
 #include <openssl/evp.h>
 #include <algorithm>
 #include <iomanip>
@@ -26,7 +27,7 @@ std::string sha256(const std::string &data)
     return ss.str();
 }
 
-MerkleTree::MerkleTree(const std::vector<std::string> &transactions)
+MerkleTree::MerkleTree(const std::vector<std::string> &transactions) : transactions(transactions)
 {
     buildTree(transactions);
 }
@@ -40,6 +41,74 @@ bool MerkleTree::contains(const std::string &transaction) const
 
     // Search only the leaf nodes, which are stored in the first half of the 'hashes' vector.
     return std::find(hashes.begin(), hashes.begin() + numLeafNodes, hash) != hashes.begin() + numLeafNodes;
+}
+
+void MerkleTree::display() const
+{
+    int level = 0;
+    int count = 0;
+    int total = hashes.size();
+    int nodesInLevel = 1;
+
+    // Calculate the number of leaf nodes (the first level of the tree).
+    size_t numLeafNodes = (hashes.size() + 1) / 2;
+    size_t leafNodeIndex = 0;
+
+    for (const auto &hash : hashes)
+    {
+        if (count == 0)
+        {
+            std::cout << "Level " << level << ":\n";
+        }
+
+        if (level == 0)
+        {
+            std::cout << "  " << hash << "  ";
+        }
+        else
+        {
+            std::cout << hash << " ";
+        }
+
+        count++;
+
+        if (count == nodesInLevel)
+        {
+            std::cout << std::endl;
+
+            if (level == 0)
+            {
+                std::cout << " /";
+                for (int i = 0; i < nodesInLevel - 1; ++i)
+                {
+                    std::cout << "       \\";
+                }
+                std::cout << std::endl;
+            }
+
+            level++;
+            nodesInLevel *= 2;
+            count = 0;
+        }
+
+        if (level * 2 == total)
+        {
+            break;
+        }
+    }
+
+    std::cout << "Leaves:" << std::endl;
+    for (const auto &tx : transactions)
+    {
+        std::cout << tx << " ";
+        leafNodeIndex++;
+
+        if (leafNodeIndex == numLeafNodes)
+        {
+            break;
+        }
+    }
+    std::cout << std::endl;
 }
 
 void MerkleTree::buildTree(const std::vector<std::string> &transactions)
