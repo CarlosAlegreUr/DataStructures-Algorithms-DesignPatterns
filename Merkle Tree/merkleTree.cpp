@@ -5,6 +5,7 @@
 #include <openssl/evp.h>
 #include <iomanip>
 #include <sstream>
+#include <cassert>
 
 std::string sha256(const std::string &data)
 {
@@ -39,7 +40,12 @@ public:
     bool contains(const std::string &transaction)
     {
         std::string hash = sha256(transaction);
-        return std::find(hashes.begin(), hashes.end(), hash) != hashes.end();
+
+        // Calculate the number of leaf nodes (the first level of the tree).
+        size_t numLeafNodes = (hashes.size() + 1) / 2;
+
+        // Search only the leaf nodes, which are stored in the first half of the 'hashes' vector.
+        return std::find(hashes.begin(), hashes.begin() + numLeafNodes, hash) != hashes.begin() + numLeafNodes;
     }
 
 private:
@@ -81,8 +87,6 @@ private:
     }
 };
 
-#include <cassert>
-
 void run_tests()
 {
     std::vector<std::string> transactions = {"Tx1", "Tx2", "Tx3", "Tx4", "Tx5"};
@@ -108,15 +112,15 @@ int main()
         "Tx1", "Tx2", "Tx3", "Tx4", "Tx5"};
 
     for (size_t i = 0; i < transactions.size(); ++i)
-    { // Changed the loop index variable type to size_t
+    {
         transactions[i] += std::to_string(rand());
     }
 
     MerkleTree merkleTree(transactions);
 
     std::string input;
-    std::cout << "Enter a transaction to check if it's in the Merkle Tree (type 'exit' to quit): ";
-    while (std::getline(std::cin, input) && input != "exit")
+    std::cout << "Enter a transaction to check if it's in the Merkle Tree (type 'q' to quit): ";
+    while (std::getline(std::cin, input) && input != "q")
     {
         if (merkleTree.contains(input))
         {
@@ -126,7 +130,7 @@ int main()
         {
             std::cout << "The transaction is not in the Merkle Tree." << std::endl;
         }
-        std::cout << "Enter another transaction (type 'exit' to quit): ";
+        std::cout << "Enter another transaction (type 'q' to quit): ";
     }
 
     return 0;
