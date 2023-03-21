@@ -28,15 +28,3 @@ To run the tests and start the interactive prompt, execute the compiled binary:
 ```sh
 ./main
 ```
-
-## Usage
-
-Enter a transaction to check if it's in the Merkle Tree. Type 'exit' to quit the program.
-
-```
-Enter a transaction to check if it's in the Merkle Tree (type 'exit' to quit): Tx1
-The transaction is in the Merkle Tree.
-Enter another transaction (type 'exit' to quit): NonExistent
-The transaction is not in the Merkle Tree.
-Enter another transaction (type 'exit' to quit): exit
-```
