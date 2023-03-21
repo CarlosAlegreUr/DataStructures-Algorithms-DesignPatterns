@@ -17,7 +17,7 @@ make
 To run the tests and start the interactive prompt, execute the compiled binary:
 
 ```sh
-./merkleTree
+./main
 ```
 
 ## Usage
