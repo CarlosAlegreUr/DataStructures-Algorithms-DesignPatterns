@@ -13,6 +13,16 @@ void displayOptions()
     std::cout << "5. Quit\n";
 }
 
+template <typename T>
+void printArray(const DynamicArray<T> &arr)
+{
+    for (int i = 0; i < arr.getSize(); i++)
+    {
+        std::cout << arr[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
 int main()
 {
     testDynamicArray();
@@ -46,21 +56,11 @@ int main()
 
         if (useIntArray)
         {
-            std::cout << "Current array: ";
-            for (int i = 0; i < intArray.getSize(); i++)
-            {
-                std::cout << intArray[i] << " ";
-            }
-            std::cout << std::endl;
+            printArray(intArray);
         }
         else
         {
-            std::cout << "Current array: ";
-            for (int i = 0; i < stringArray.getSize(); i++)
-            {
-                std::cout << stringArray[i] << " ";
-            }
-            std::cout << std::endl;
+            printArray(stringArray);
         }
 
         switch (choice)
@@ -73,6 +73,7 @@ int main()
                 int value;
                 std::cin >> value;
                 intArray.push_back(value);
+                printArray(intArray);
             }
             else
             {
@@ -80,6 +81,7 @@ int main()
                 std::string value;
                 std::cin >> value;
                 stringArray.push_back(value);
+                printArray(stringArray);
             }
             break;
         }
@@ -90,6 +92,7 @@ int main()
                 if (intArray.getSize() > 0)
                 {
                     intArray.pop_back();
+                    printArray(intArray);
                 }
                 else
                 {
@@ -101,6 +104,7 @@ int main()
                 if (stringArray.getSize() > 0)
                 {
                     stringArray.pop_back();
+                    printArray(stringArray);
                 }
                 else
                 {
@@ -123,6 +127,7 @@ int main()
                 try
                 {
                     intArray.insertAt(index, value);
+                    printArray(intArray);
                 }
                 catch (std::out_of_range &)
                 {
@@ -137,13 +142,14 @@ int main()
                 try
                 {
                     stringArray.insertAt(index, value);
+                    printArray(stringArray);
                 }
                 catch (std::out_of_range &)
                 {
                     std::cout << "Invalid index!" << std::endl;
                 }
+                break;
             }
-            break;
         }
         case 4:
         {
@@ -156,6 +162,7 @@ int main()
                 try
                 {
                     intArray.deleteAt(index);
+                    printArray(intArray);
                 }
                 catch (std::out_of_range &)
                 {
@@ -167,6 +174,7 @@ int main()
                 try
                 {
                     stringArray.deleteAt(index);
+                    printArray(stringArray);
                 }
                 catch (std::out_of_range &)
                 {
@@ -181,7 +189,7 @@ int main()
             break;
         }
         }
-    }
+        }
 
     return 0;
 }
