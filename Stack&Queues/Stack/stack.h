@@ -5,11 +5,11 @@
 class Stack
 {
 public:
-    void push();
+    void push(int _data);
     void pop();
-    void top();
-    void size();
-    void isEmpty();
+    Node top();
+    int size();
+    bool isEmpty();
 
 private:
     Node lastElement;
