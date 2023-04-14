@@ -1,42 +1,55 @@
+#include <stdexcept>
 #include "stack.h"
 
 void Stack::push(int _data)
 {
     Node *newNode = new Node();
     newNode->data = _data;
-    this->lastElement.nextElement = newNode;
-    newNode->prevElement = &this->lastElement;
-    this->lastElement = *newNode;
+
+    if (!this->isEmpty())
+    {
+        this->lastElement->nextElement = newNode;
+        newNode->prevElement = this->lastElement;
+    }
+    else
+        newNode->prevElement = nullptr;
+
+    newNode->nextElement = nullptr;
+    this->lastElement = newNode;
+    this->currentSize++;
 }
 
 void Stack::pop()
 {
+    if (this->isEmpty())
+        return;
     if (this->size() != 0)
-        this->lastElement = *this->lastElement.prevElement;
-}
-
-Node &Stack::top()
-{
-    return this->lastElement;
-}
-
-int Stack::size()
-{
-    if (this->lastElement.data != -1)
     {
-        int size = 1;
-        Node *iterator = &this->lastElement;
-        while (iterator != nullptr)
+        Node *temp = this->lastElement;
+        this->lastElement = this->lastElement->prevElement;
+        if (this->lastElement)
         {
-            size++;
-            iterator = iterator->prevElement;
+            this->lastElement->nextElement = nullptr;
         }
-        return size;
+        delete temp;
+        this->currentSize--;
     }
-    return 0;
 }
 
-bool Stack::isEmpty()
+Node &Stack::top() const
 {
-    return (this->size() == 0);
+    if (!this->isEmpty())
+        return *(this->lastElement);
+    else
+        throw std::runtime_error("Trying to access top of an empty stack.");
+}
+
+int Stack::size() const
+{
+    return currentSize;
+}
+
+bool Stack::isEmpty() const
+{
+    return (currentSize == 0);
 }

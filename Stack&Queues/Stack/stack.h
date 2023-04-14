@@ -5,12 +5,15 @@
 class Stack
 {
 public:
+    Stack() : lastElement(nullptr), currentSize(0){};
+
     void push(int _data);
     void pop();
-    Node top();
-    int size();
-    bool isEmpty();
+    Node &top() const;
+    int size() const;
+    bool isEmpty() const;
 
 private:
-    Node lastElement;
+    Node *lastElement;
+    int currentSize;
 };

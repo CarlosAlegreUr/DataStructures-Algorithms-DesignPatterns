@@ -9,7 +9,7 @@ main: main.o stack.o testStack.o
 main.o: main.cpp stack.h testStack.h
 	$(CXX) $(CXXFLAGS) -c main.cpp
 
-stack.o: stack.cpp stack.h node.h
+stack.o: stack.cpp ../node.h stack.h
 	$(CXX) $(CXXFLAGS) -c stack.cpp
 
 testStack.o: testStack.cpp stack.h testStack.h

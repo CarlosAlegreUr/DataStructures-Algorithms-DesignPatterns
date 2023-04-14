@@ -6,17 +6,23 @@ void runTests();
 
 void displayStack(Stack &stack)
 {
+    if (stack.isEmpty())
+    {
+        std::cout << "The stack is empty." << std::endl;
+        return;
+    }
+
     Node *iterator = &stack.top();
     while (iterator != nullptr)
     {
+        std::cout << iterator->data;
+
         if (iterator->prevElement == nullptr)
         {
-            std::cout << iterator->data << " <--" << std::endl;
+            std::cout << " <--";
         }
-        else
-        {
-            std::cout << iterator->data << std::endl;
-        }
+
+        std::cout << std::endl;
         iterator = iterator->prevElement;
     }
 }
@@ -58,8 +64,15 @@ int main()
             displayStack(stack);
             break;
         case '3':
-            std::cout << "Top: " << stack.top().data << std::endl;
-            displayStack(stack);
+            if (!stack.isEmpty())
+            {
+                std::cout << "Top: " << stack.top().data << std::endl;
+                displayStack(stack);
+            }
+            else
+            {
+                std::cout << "The stack is empty." << std::endl;
+            }
             break;
         case '4':
             std::cout << "Size: " << stack.size() << std::endl;
@@ -79,11 +92,12 @@ int main()
     return 0;
 }
 
-void runTests() {
+void runTests()
+{
     testPushPopTop();
     testSize();
     testIsEmpty();
 
-    std::cout << "All tests passed!" << std::endl << std::endl;
+    std::cout << "All tests passed!" << std::endl
+              << std::endl;
 }
-
