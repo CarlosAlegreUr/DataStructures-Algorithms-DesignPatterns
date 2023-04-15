@@ -3,7 +3,7 @@ CXXFLAGS = -Wall -std=c++11
 
 SRC = main.cpp deque.cpp testDeque.cpp
 OBJ = $(SRC:.cpp=.o)
-EXEC = deque
+EXEC = main
 
 all: $(EXEC)
 

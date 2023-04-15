@@ -26,8 +26,8 @@ void testPopFrontBack()
     deque.pushFront(1);
     deque.pushBack(2);
     deque.pushFront(3);
-
     deque.popFront();
+
     assert(deque.front().data == 1);
     assert(deque.back().data == 2);
 
