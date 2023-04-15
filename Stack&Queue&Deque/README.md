@@ -1,4 +1,4 @@
-# Stacks and Queues
+# Stack, Queue and Deque
 
 Basic implementations of stack, queue, and deque. Each of these data structures has its own folder containing the respective source code. Additionally, the `node.h` file contains the code for a `Node` class that is utilized by all the implementations.
 
