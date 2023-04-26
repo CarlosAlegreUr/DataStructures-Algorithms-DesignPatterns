@@ -4,8 +4,9 @@
 #include <string>
 #include <cassert>
 
-void testInsertAndGet() {
-    HashTable<std::string, int> ht;
+void testInsertAndGet()
+{
+    HashTable<int> ht;
     ht.insert("one", 1);
     ht.insert("two", 2);
     ht.insert("three", 3);
@@ -15,8 +16,9 @@ void testInsertAndGet() {
     assert(ht.get("three") == 3);
 }
 
-void testRemove() {
-    HashTable<std::string, int> ht;
+void testRemove()
+{
+    HashTable<int> ht;
     ht.insert("one", 1);
     ht.insert("two", 2);
     ht.insert("three", 3);
@@ -26,8 +28,9 @@ void testRemove() {
     assert(!ht.containsKey("two"));
 }
 
-void testSize() {
-    HashTable<std::string, int> ht;
+void testSize()
+{
+    HashTable<int> ht;
     ht.insert("one", 1);
     ht.insert("two", 2);
     ht.insert("three", 3);
@@ -35,8 +38,9 @@ void testSize() {
     assert(ht.size() == 3);
 }
 
-void testClear() {
-    HashTable<std::string, int> ht;
+void testClear()
+{
+    HashTable<int> ht;
     ht.insert("one", 1);
     ht.insert("two", 2);
     ht.insert("three", 3);
@@ -46,9 +50,11 @@ void testClear() {
     assert(ht.size() == 0);
 }
 
-void testResize() {
-    HashTable<std::string, int> ht;
-    for (int i = 1; i <= 10; ++i) {
+void testResize()
+{
+    HashTable<int> ht;
+    for (int i = 1; i <= 10; ++i)
+    {
         ht.insert("key" + std::to_string(i), i);
     }
 
@@ -57,8 +63,9 @@ void testResize() {
     assert(ht.size() == 10);
 }
 
-void testContainsKey() {
-    HashTable<std::string, int> ht;
+void testContainsKey()
+{
+    HashTable<int> ht;
     ht.insert("one", 1);
     ht.insert("two", 2);
     ht.insert("three", 3);
@@ -67,8 +74,9 @@ void testContainsKey() {
     assert(!ht.containsKey("four"));
 }
 
-void testContainsValue() {
-    HashTable<std::string, int> ht;
+void testContainsValue()
+{
+    HashTable<int> ht;
     ht.insert("one", 1);
     ht.insert("two", 2);
     ht.insert("three", 3);
@@ -77,7 +85,8 @@ void testContainsValue() {
     assert(!ht.containsValue(4));
 }
 
-void runTests() {
+void runTests()
+{
     std::cout << "Running hash table tests..." << std::endl;
 
     testInsertAndGet();

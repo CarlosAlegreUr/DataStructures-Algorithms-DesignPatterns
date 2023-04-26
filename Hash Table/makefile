@@ -1,22 +1,26 @@
+# Compiler
 CXX = g++
-CXXFLAGS = -std=c++11 -Wall -Wextra
 
-SOURCES = main.cpp hashTable.cpp testHashTable.cpp
-OBJECTS = $(SOURCES:.cpp=.o)
+# Compiler flags
+CXXFLAGS = -Wall -Wextra -std=c++11
 
-.PHONY: all clean run_tests
+# Object files
+OBJS = main.o testHashTable.o
 
-all: run_tests main
+# Target executable
+TARGET = main
 
-main: $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+# Build rules
+all: $(TARGET)
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $(TARGET)
 
-run_tests: testHashTable.o hashTable.o
-	$(CXX) $(CXXFLAGS) $^ -o $@
-	./run_tests
+main.o: main.cpp hashTable.h testHashTable.h
+	$(CXX) $(CXXFLAGS) -c main.cpp
+
+testHashTable.o: testHashTable.cpp testHashTable.h hashTable.h
+	$(CXX) $(CXXFLAGS) -c testHashTable.cpp
 
 clean:
-	rm -f $(OBJECTS) main run_tests
+	rm -f $(OBJS) $(TARGET)
