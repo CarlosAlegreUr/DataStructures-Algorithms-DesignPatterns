@@ -1,19 +1,21 @@
-CC = g++
-CFLAGS = -std=c++11 -Wall -Wextra -g
+CXX = g++
+CXXFLAGS = -Wall -Wextra -std=c++11
+
+OBJS = main.o binaryTree.o testBinaryTree.o
 
 all: main
 
-main: main.o binaryTree.o testBinaryTree.o
-	$(CC) $(CFLAGS) -o main main.o binaryTree.o testBinaryTree.o
+main: $(OBJS)
+	$(CXX) $(CXXFLAGS) -o main $(OBJS)
 
 main.o: main.cpp binaryTree.h testBinaryTree.h
-	$(CC) $(CFLAGS) -c main.cpp
+	$(CXX) $(CXXFLAGS) -c main.cpp
 
 binaryTree.o: binaryTree.cpp binaryTree.h
-	$(CC) $(CFLAGS) -c binaryTree.cpp
+	$(CXX) $(CXXFLAGS) -c binaryTree.cpp
 
 testBinaryTree.o: testBinaryTree.cpp testBinaryTree.h binaryTree.h
-	$(CC) $(CFLAGS) -c testBinaryTree.cpp
+	$(CXX) $(CXXFLAGS) -c testBinaryTree.cpp
 
 clean:
 	rm -f *.o main

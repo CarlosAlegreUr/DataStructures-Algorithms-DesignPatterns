@@ -1,17 +1,22 @@
 #pragma once
 
+#include <vector>
+#include <iostream>
+
 struct TreeNode
 {
     int data;
     TreeNode *left;
     TreeNode *right;
-    TreeNode(int value) : data(value), left(nullptr), right(nullptr) {}
+    TreeNode *parent;
+    TreeNode(int value) : data(value), left(nullptr), right(nullptr), parent(nullptr) {}
+    TreeNode(int value, TreeNode *parent) : data(value), left(nullptr), right(nullptr), parent(parent) {}
 };
 
 class BinaryTree
 {
 public:
-    BinaryTree() : root(nullptr), numOfNodes(0){};
+    BinaryTree() : root(nullptr), numOfNodes(0), lastNodeInserted(nullptr){};
     ~BinaryTree();
 
     void insert(int value);
@@ -24,6 +29,9 @@ public:
     void levelOrderTraversal();
 
 private:
+    void updateLastNodeInserted();
+    std::vector<std::vector<int>> getAllPathsFromNode(TreeNode *node) const;
     TreeNode *root;
+    TreeNode *lastNodeInserted;
     int numOfNodes;
 };

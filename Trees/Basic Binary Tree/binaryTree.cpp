@@ -3,11 +3,86 @@
 #include <cmath>
 #include <vector>
 
-BinaryTree::BinaryTree() : root(nullptr) {}
+// HELPER FUNCTIONS
+
+void dfs(TreeNode *node, std::vector<int> path, std::vector<std::vector<int>> &result)
+{
+    if (node->left == nullptr && node->right == nullptr)
+    {
+        result.push_back(path);
+        return;
+    }
+    else
+    {
+        path.push_back(node->data);
+
+        if (node->left != nullptr)
+        {
+            dfs(node->left, path, result);
+        }
+
+        if (node->right != nullptr)
+        {
+            dfs(node->right, path, result);
+        }
+    }
+}
+
+// Appends all children and grandChildren and family of node to q.
+void emplaceChildren(std::queue<TreeNode *> q, TreeNode *node)
+{
+    if (!(node->right == nullptr && node->left == nullptr))
+    {
+        if (node->left != nullptr && node->right != nullptr)
+        {
+            q.emplace(node->left);
+            q.emplace(node->right);
+        }
+        else
+        {
+            if (node->right == nullptr)
+                q.emplace(node->left);
+
+            if (node->left == nullptr)
+                q.emplace(node->right);
+        }
+    }
+}
+
+// Appends all children and grandChildren and family of node to q.
+void emplaceChildren(std::queue<std::pair<TreeNode *, bool>> q, TreeNode *node)
+{
+    if (!(node->right == nullptr && node->left == nullptr))
+    {
+        if (node->left != nullptr && node->right != nullptr)
+        {
+            q.emplace(std::pair<TreeNode *, bool>(node->left, true));
+            q.emplace(std::pair<TreeNode *, bool>(node->right, false));
+        }
+        else
+        {
+            if (node->right == nullptr)
+                q.emplace(std::pair<TreeNode *, bool>(node->left, true));
+
+            if (node->left == nullptr)
+                q.emplace(std::pair<TreeNode *, bool>(node->right, false));
+        }
+    }
+}
+///////////////////////////////////////////////
 
 BinaryTree::~BinaryTree()
 {
-    // TODO: Implement destructor to delete all nodes
+    std::queue<TreeNode *> q;
+    q.emplace(this->root);
+    emplaceChildren(q, this->root);
+    TreeNode *toDelete;
+    for (int i = 0; i < q.size(); i++)
+    {
+        toDelete = q.front();
+        q.pop();
+        delete toDelete;
+    }
 }
 
 void BinaryTree::insert(int value)
@@ -24,6 +99,7 @@ void BinaryTree::insert(int value)
             {
                 found = true;
                 it->left = newNode;
+                newNode->parent = it;
             }
             else
             {
@@ -31,6 +107,7 @@ void BinaryTree::insert(int value)
                 {
                     found = true;
                     it->right = newNode;
+                    newNode->parent = it;
                 }
                 else
                 {
@@ -44,61 +121,40 @@ void BinaryTree::insert(int value)
     }
     else
         this->root = newNode;
+    this->lastNodeInserted = newNode;
     this->numOfNodes++;
 }
 
-// Not finished.
 void BinaryTree::remove(int value)
 {
     if (this->size() != 0)
     {
         TreeNode *it = this->root;
-        std::queue<TreeNode *> q;
+        // Queue for checking nodes, if bool = true means node is leftChild, if
+        // false node is right child.
+        std::queue<std::pair<TreeNode *, bool>> q;
         int i = 0;
         bool removed = false;
-        TreeNode *parentNode = it;
         while (i < numOfNodes && !removed)
         {
-            if (it->left != nullptr && it->right != nullptr)
+            if (it->data == value)
             {
-                if (it->data != value)
-                {
-                    q.emplace(it->left);
-                    q.emplace(it->right);
-                    q.pop();
-                    it = q.front();
-                    i++;
-                }
-                else
-                {
-
-                    removed = true;
-                }
+                removed = true;
+                it->data = this->lastNodeInserted->data;
+                TreeNode *toDelete = this->lastNodeInserted;
+                updateLastNodeInserted();
+                delete toDelete;
             }
             else
             {
-                if (it->right == nullptr && it->left != nullptr)
+                emplaceChildren(q, it);
+                if (!q.empty())
                 {
-                    if (it->data != value)
-                    {
-                        q.emplace(it->left);
-                        q.pop();
-                        it = q.front();
-                        i++;
-                    }
-                    else
-                    {
-                        // Restructure the tree, left childs alwas take palce of the parent.
-                        removed = true;
-                    }
+                    q.pop();
+                    if (!q.empty())
+                        it = q.front().first;
                 }
-                else
-                {
-                    if (it->data == value)
-                    {
-                        removed = true;
-                    }
-                }
+                i++;
             }
         }
     }
@@ -118,9 +174,12 @@ bool BinaryTree::search(int value)
                 found = true;
             else
             {
-                q.emplace(it->left);
-                q.emplace(it->right);
-                q.pop();
+                if (it->left != nullptr)
+                    q.emplace(it->left);
+                if (it->right != nullptr)
+                    q.emplace(it->right);
+                if (!q.empty())
+                    q.pop();
                 i++;
             }
         }
@@ -129,6 +188,8 @@ bool BinaryTree::search(int value)
     return false;
 }
 
+// Because of the way elements are inserted, removed and sorted in this binary tree,
+// you only need to check or powers of 2 when computing the height.
 int BinaryTree::height()
 {
     if (this->size() == 0 || this->size() == 1)
@@ -153,10 +214,10 @@ int BinaryTree::size()
     return this->numOfNodes;
 }
 
-// Missunderstood what balanced means.
+// Because of the way elements are inserted, removed and sorted in this binary tree, its always balanced.
 bool BinaryTree::isBalanced()
 {
-    return (pow(2, this->height()) == this->numOfNodes);
+    return true;
 }
 
 // Assuming path can start anywhere and no node has negative values. (wrong implementation)
@@ -167,57 +228,30 @@ int BinaryTree::pathSum(int target)
         return 0;
     else
     {
-        TreeNode *it = this->root;
         std::queue<TreeNode *> q;
-        int i = 0;
-        while (i < numOfNodes)
+        q.emplace(this->root);
+        emplaceChildren(q, this->root);
+
+        TreeNode *it;
+        for (int i = 0; i < q.size(); i++)
         {
-            if (it->left != nullptr && it->right != nullptr)
+            it = q.front();
+            std::vector<std::vector<int>> paths = getAllPathsFromNode(it);
+            q.pop();
+            for (std::vector<int> path : paths)
             {
-                q.emplace(it->left);
-                q.emplace(it->right);
-
-                std::queue<TreeNode *> q2;
-                q2.emplace(it);
-
-                int cumSum = it->data;
-                TreeNode *it2 = it;
-                while (!q2.empty())
+                int cumSum = 0;
+                for (int value : path)
                 {
-                    bool pathFound = false;
-                    if ((cumSum + it2->left->data) <= target)
-                    {
-                        q2.emplace(it2->left);
-                        if ((cumSum + it2->left->data) == target)
-                        {
-                            numOfPaths++;
-                            pathFound = true;
-                        }
-                    }
-
-                    if ((cumSum + it2->right->data) <= target)
-                    {
-                        q2.emplace(it2->right);
-                        if ((cumSum + it2->right->data) == target)
-                        {
-                            numOfPaths++;
-                            pathFound = true;
-                        }
-                    }
-
-                    q2.pop();
-                    if (!q2.empty())
-                        it2 = q2.front();
-
-                    if (pathFound)
-                        cumSum = it2->data;
+                    cumSum += value;
+                    if (cumSum == target)
+                        numOfPaths++;
                     else
-                        cumSum += it2->data;
+                    {
+                        if (cumSum > target)
+                            break;
+                    }
                 }
-
-                q.pop();
-                it = q.front();
-                i++;
             }
         }
     }
@@ -233,24 +267,43 @@ void BinaryTree::levelOrderTraversal()
         int i = 0;
         while (i < numOfNodes)
         {
-            if (it->left != nullptr && it->right != nullptr)
+            emplaceChildren(q, it);
+            if (!q.empty())
             {
-                q.emplace(it->left);
-                q.emplace(it->right);
                 q.pop();
-                it = q.front();
-                i++;
-            }
-            else
-            {
-                if (it->right == nullptr && it->left != nullptr)
-                {
-                    q.emplace(it->left);
-                    q.pop();
+                if (!q.empty())
                     it = q.front();
-                    i++;
-                }
             }
+            i++;
         }
     }
 }
+
+// Only called from remove() function.
+void BinaryTree::updateLastNodeInserted()
+{
+    TreeNode *parentOfLastNode = this->lastNodeInserted->parent;
+    if (parentOfLastNode->left == this->lastNodeInserted)
+    {
+        parentOfLastNode->left = nullptr;
+        this->lastNodeInserted = nullptr;
+        std::queue<TreeNode *> q;
+        emplaceChildren(q, this->root);
+        this->lastNodeInserted = q.back();
+    }
+    else
+    {
+        parentOfLastNode->right = nullptr;
+        this->lastNodeInserted = parentOfLastNode->left;
+    }
+}
+
+std::vector<std::vector<int>> BinaryTree::getAllPathsFromNode(TreeNode *node) const
+{
+    std::vector<std::vector<int>> result;
+    std::vector<int> path;
+
+    dfs(node, path, result);
+
+    return result;
+};
