@@ -7,7 +7,7 @@ Set::~Set() {}
 
 bool Set::insert(int val)
 {
-    if (this->hash_map[val] == false)
+    if (this->hash_map.count(val) == 0)
     {
         this->keys.push_back(val);
         this->hash_map[val] = true;
@@ -18,19 +18,23 @@ bool Set::insert(int val)
 
 bool Set::remove(int val)
 {
-    if (this->hash_map[val] == true)
+    if (this->hash_map.count(val) > 0)
     {
-        std::vector<int>::const_iterator index = std::find(this->keys.begin(), this->keys.end(), val);
-        this->keys.erase(index);
-        this->hash_map[val] = false;
-        return true;
+        auto it = std::find(this->keys.begin(), this->keys.end(), val);
+        if (it != this->keys.end())
+        {
+            std::swap(*it, this->keys.back());
+            this->keys.pop_back();
+            this->hash_map.erase(val);
+            return true;
+        }
     }
     return false;
 }
 
 bool Set::contains(int val)
 {
-    return this->hash_map[val];
+    return this->hash_map.count(val) > 0;
 }
 
 std::size_t Set::size() const
