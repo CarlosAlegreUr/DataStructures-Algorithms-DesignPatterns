@@ -63,7 +63,7 @@ void Trie::remove(std::string word)
     {
         if (i == word.size() - 1 && it->isEndOfWord == true)
         {
-            // Las char of the word, check if it's prefix of bigger words.
+            // Last char of the word, check if it's prefix of bigger words.
             for (int j = 0; j < it->children.size(); j++)
             {
                 if (it->children[j] != nullptr)
@@ -82,13 +82,25 @@ void Trie::remove(std::string word)
                 prevOne = it2;
                 int charIndex = this->charToIndex(word[j]);
                 it2 = it2->children[charIndex];
-                delete prevOne;
+
+                // Checks if there are words having as suffix some part of the word being deleted.
+                bool needDeletion = true;
+                for (int k = 0; k < prevOne->children.size(); k++)
+                {
+                    if (prevOne->children[k] != nullptr && k != charIndex)
+                    {
+                        needDeletion = false;
+                        break;
+                    }
+                }
+                if (needDeletion)
+                    delete prevOne;
             }
         }
 
-        // Keep traversing trie till lats char node.
+        // Keep traversing trie till last char node.
         int charIndex = this->charToIndex(word[i]);
-        if (it->children[charIndex] == nullptr)
+        if (it->children[charIndex] == nullptr) // Word is not even in the tire so do nothing.
             return;
         else
             it = it->children[charIndex];
