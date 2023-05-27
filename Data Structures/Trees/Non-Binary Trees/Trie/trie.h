@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <vector>
 
@@ -32,6 +33,7 @@ public:
     bool startsWith(std::string prefix);
 
 private:
+    bool removeHelper(TrieNode *node, std::string word, int depth);
     int charToIndex(char c);
     TrieNode *root;
 };
